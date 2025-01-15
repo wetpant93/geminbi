@@ -7,13 +7,13 @@ from tangles.convenience import SurveyTangles
 
 def get_tangle_range(Range: tuple[int, int], tangles: SurveyTangles) -> np.ndarray:
     """
-    Let Range = (`x1`, `x2`): 
+    Let Range = (`x1`, `x2`):
         Returns all tangles that have specified atleast `x1` and atmost `x2` many questions.
 
     Parameters
     ----------
-    Range: tuple[int, int] 
-    Tangles: SurveyTangles 
+    Range: tuple[int, int]
+    Tangles: SurveyTangles
 
     """
     lower_bound, upper_bound = Range
@@ -35,13 +35,13 @@ def create_tangle_table(tangles: SurveyTangles, specified: int | tuple[int, int]
     If Specfied is a pair of ints, say (`x1`, `x2`):
         Returns a dict of all tangles that have specified atleast `x1` and atmost `x2` many questions.
 
-    The keys of the returned dict, starting from 0, are the enumerated tangles that fullfilled the condition 
+    The keys of the returned dict, starting from 0, are the enumerated tangles that fullfilled the condition
     imposed by Specfied.
 
     Parameters
     ----------
     Tangles: SurveyTangles
-    Specified: int | tuple[int, int] 
+    Specified: int | tuple[int, int]
     """
     if isinstance(specified, int):
         tangle_matrix = tangles.tangle_matrix()
@@ -86,7 +86,7 @@ class InterestFunction:
         """
         Given FirstKey and SecondKey of the specified TangleTable, computes the amount of questions that the tangles:
             t1 = TangleTable[FirstKey] and t2 = TangleTable[SecondKey]
-        have specified differently. 
+        have specified differently.
         Questions that atleast one of the tangles did not specify are not counted.
 
         Parameters
@@ -101,12 +101,12 @@ class InterestFunction:
         second_tangle = self.tangle_table.get(second_key)
 
         if first_tangle is None:
-            raise ValueError(f'The FirstKey: {
-                             first_key}, is not a valid key of TangleTable')
+            raise ValueError(f'The FirstKey: {first_key}'
+                             + 'is not a valid key of TangleTable')
 
         elif second_tangle is None:
-            raise ValueError(f'The SecondKey: {
-                             second_key}, is not a valid key of TangleTable')
+            raise ValueError(f'The SecondKey: {second_key}'
+                             + 'is not a valid key of TangleTable')
 
         count_zeros_first_tangle = np.count_nonzero(first_tangle == 0)
         count_zeros_second_tangle = np.count_nonzero(second_tangle == 0)

@@ -8,6 +8,7 @@ class TangleDatasets(StrEnum):
     O1 = 'TangleDatasets/Flash-O1-50'
     O1Ratio = 'TangleDatasets/Flash-O1Ratio-50'
     Entropy = 'TangleDatasets/Flash-Entropy-50'
+    InformationGain = 'TangleDatasets/Flash-InformationGain-50'
 
     def __str__(self):
         """
@@ -21,6 +22,8 @@ class TangleDatasets(StrEnum):
                 return "O1Ratio"
             case TangleDatasets.Entropy:
                 return "Entropy"
+            case TangleDatasets.InformationGain:
+                return "InformationGain"
             case _:
                 return None
 
@@ -57,7 +60,8 @@ class TangleDatasets(StrEnum):
         """
         if self in [TangleDatasets.O1,
                     TangleDatasets.O1Ratio,
-                    TangleDatasets.Entropy]:
+                    TangleDatasets.Entropy,
+                    TangleDatasets.InformationGain]:
             TanglePath = self.value
             with open(TanglePath, 'rb') as File:
                 Dataset = pickle.load(File)

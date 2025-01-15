@@ -48,39 +48,39 @@ def show_tangle_matrix(tangle_matrix: np.ndarray,
     plt.show()
 
 
-Dataset = ds.TangleDatasets.O1
+Dataset = ds.TangleDatasets.InformationGain
 data = Dataset.load()
 tangles: SurveyTangles = data['tangles']
 questions: dict[str, str] = data['questions']
-AGREEMENT: int = 50
+AGREEMENT: int = 75
 
 # alle variabeln in snake_case ; alle klassen in CamelCase
 # information gain - order
 
 tangles.change_agreement(AGREEMENT)
 
-Viewer = tl.TangleViewer(tangles, questions)
-TangleMatrix = tangles.tangle_matrix()
+viewer = tl.TangleViewer(tangles, questions)
+tangle_matrix = tangles.tangle_matrix()
 
-Title = f'OrderFunction = {str(Dataset)}, Agreement = {AGREEMENT}'
+title = f'OrderFunction = {str(Dataset)}, Agreement = {AGREEMENT}'
 
-tangle_table = it.create_tangle_table(tangles, specified=50)
-InterestFunction = it.InterestFunction(tangle_table)
-all_cliques = InterestFunction.get_all_cliques(threshold=50)
-max_cliques = InterestFunction.get_maximal_cliques(all_cliques)
-average_specified = dict((Size, InterestFunction.average_specified_questions(max_cliques[Size]))
-                         for Size in max_cliques)
+tangle_table = it.create_tangle_table(tangles, specified=70)
+interest_function = it.InterestFunction(tangle_table)
+all_cliques = interest_function.get_all_cliques(threshold=2)
+max_cliques = interest_function.get_maximal_cliques(all_cliques)
+average_specified = dict((clique_size,
+                          interest_function.average_specified_questions(max_cliques[clique_size]))
+                         for clique_size in max_cliques)
 
-scores = dict((size, InterestFunction.key_list_order(max_cliques[size]))
+scores = dict((size, interest_function.key_list_order(max_cliques[size]))
               for size in max_cliques)
 
 
 def show_key_list(key_list):
-    return show_difference(InterestFunction.key_list_to_tangle_matrix(key_list),
-                           Viewer,
-                           title=Title)
+    """Shows the differences of tangles specified by the key_list."""
+    return show_difference(interest_function.key_list_to_tangle_matrix(key_list),
+                           viewer,
+                           title=title)
 
 
-show_tangle_matrix(TangleMatrix, title=Title)
-
-show_key_list(max_cliques[3])
+show_tangle_matrix(tangle_matrix, title=title)

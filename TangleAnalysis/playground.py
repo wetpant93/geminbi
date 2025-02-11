@@ -48,11 +48,12 @@ def show_tangle_matrix(tangle_matrix: np.ndarray,
     plt.show()
 
 
-Dataset = ds.TangleDatasets.InformationGain
+Dataset = ds.TangleDatasets.O1Flash
 data = Dataset.load()
 tangles: SurveyTangles = data['tangles']
 questions: dict[str, str] = data['questions']
-AGREEMENT: int = 75
+AGREEMENT: int = 85
+
 
 # alle variabeln in snake_case ; alle klassen in CamelCase
 # information gain - order
@@ -64,7 +65,7 @@ tangle_matrix = tangles.tangle_matrix()
 
 title = f'OrderFunction = {str(Dataset)}, Agreement = {AGREEMENT}'
 
-tangle_table = it.create_tangle_table(tangles, specified=70)
+tangle_table = it.create_tangle_table(tangles, specified=0)
 interest_function = it.InterestFunction(tangle_table)
 all_cliques = interest_function.get_all_cliques(threshold=2)
 max_cliques = interest_function.get_maximal_cliques(all_cliques)

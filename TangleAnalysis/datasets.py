@@ -5,10 +5,14 @@ from tangles.convenience import SurveyTangles
 
 
 class TangleDatasets(StrEnum):
-    O1 = 'TangleDatasets/Flash-O1-50'
-    O1Ratio = 'TangleDatasets/Flash-O1Ratio-50'
-    Entropy = 'TangleDatasets/Flash-Entropy-50'
-    InformationGain = 'TangleDatasets/Flash-InformationGain-50'
+    O1Flash = 'TangleDatasets/Flash-O1-50'
+    O1RatioFlash = 'TangleDatasets/Flash-O1Ratio-50'
+    EntropyFlash = 'TangleDatasets/Flash-Entropy-50'
+    InformationGainFlash = 'TangleDatasets/Flash-InformationGain-50'
+    O1FlashNoComment = 'TangleDatasets/FlashNoComment-O1-50'
+    O1ProNoCommentUncross = 'TangleDatasets/ProNoComment-O1-UNCROSS-15'
+    O1ProNoComment = 'TangleDatasets/ProNoComment-O1-50'
+    InformationGainRatioFlash = 'TangleDatasets/Flash-InformationGainRatio-50'
 
     def __str__(self):
         """
@@ -16,14 +20,22 @@ class TangleDatasets(StrEnum):
         If the dataset is not recognized, it will return None.
         """
         match self:
-            case TangleDatasets.O1:
-                return "O1"
-            case TangleDatasets.O1Ratio:
-                return "O1Ratio"
-            case TangleDatasets.Entropy:
-                return "Entropy"
-            case TangleDatasets.InformationGain:
-                return "InformationGain"
+            case TangleDatasets.O1Flash:
+                return "O1Flash"
+            case TangleDatasets.O1RatioFlash:
+                return "O1RatioFlash"
+            case TangleDatasets.EntropyFlash:
+                return "EntropyFlash"
+            case TangleDatasets.InformationGainFlash:
+                return "InformationGainFlash"
+            case TangleDatasets.O1FlashNoComment:
+                return "O1FlashNoComment"
+            case TangleDatasets.O1ProNoCommentUncross:
+                return "O1ProNoCommentUncross"
+            case TangleDatasets.O1ProNoComment:
+                return "O1ProNoComment"
+            case TangleDatasets.InformationGainRatioFlash:
+                return "InformationGainRatioFlash"
             case _:
                 return None
 
@@ -58,15 +70,20 @@ class TangleDatasets(StrEnum):
         self : TangleDatasets
             The dataset to load.
         """
-        if self in [TangleDatasets.O1,
-                    TangleDatasets.O1Ratio,
-                    TangleDatasets.Entropy,
-                    TangleDatasets.InformationGain]:
-            TanglePath = self.value
-            with open(TanglePath, 'rb') as File:
-                Dataset = pickle.load(File)
+        if self in [TangleDatasets.O1Flash,
+                    TangleDatasets.O1RatioFlash,
+                    TangleDatasets.EntropyFlash,
+                    TangleDatasets.InformationGainFlash,
+                    TangleDatasets.O1FlashNoComment,
+                    TangleDatasets.O1ProNoCommentUncross,
+                    TangleDatasets.O1ProNoComment,
+                    TangleDatasets.InformationGainRatioFlash]:
 
-            return Dataset
+            tangle_path = self.value
+            with open(tangle_path, 'rb') as file:
+                dataset = pickle.load(file)
+
+            return dataset
 
         else:
             raise ValueError('There is no such dataset.')
@@ -75,7 +92,7 @@ class TangleDatasets(StrEnum):
 class GeminiDatasets(StrEnum):
     Flash = 'GeminiDatasets/flash_!nq'
     Pro = 'GeminiDatasets/pro_!nq_pro'
-    FlashNoComment = 'GeminiDatasets/flash_no_commment_!nq'
+    FlashNoComment = 'GeminiDatasets/flash_no_comment_!nq'
     ProNoComment = 'GeminiDatasets/pro_no_comment_!nq'
 
     def __str__(self):

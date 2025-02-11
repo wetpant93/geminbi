@@ -42,26 +42,32 @@ def sum_col(merged_answers):
 
 def check_if_all_same_size(answerd_questions):
     length_of_answers = list(map(len, answerd_questions.values()))
+
     return all(length_of_answers[0] == Entry for Entry in length_of_answers)
 
 
-N = 3
-DATASET = f'flash_!nq{N}'
+#N = 1
 
+DATASET = f'flash_no_comment_!nq'
 
 questions = []
-answerd_questions = []
+answerd_questions = dict()
 
-with open(f'../Questioneers/!nq{N}.txt', 'r') as file:
-    Questioneer = file.read().split('\n')
-    Questioneer = [''.join(dropwhile(lambda Char: not Char.isalpha(), Question))
-                   for Question in questions
-                   if Question != '']
-    questions.extend(Questioneer)
+for N in range(1, 7):
+    with open(f'../Questioneers/!nq{N}.txt', 'r') as file:
+        Questioneer = file.read().split('\n')
+        Questioneer = [''.join(dropwhile(lambda Char: not Char.isalpha(), Question))
+                       for Question in Questioneer
+                       if Question != '']
+        questions.extend(Questioneer)
 
 
-with open(DATASET, 'rb') as file:
-    answerd_questions = pickle.load(file)
+    with open(DATASET + str(N), 'rb') as file:
+        answers = pickle.load(file)
+        answerd_questions.update(answers)
+        
+
+
 
 if check_if_all_same_size(answerd_questions):
     print('All answers are the same size!')
@@ -69,5 +75,5 @@ if check_if_all_same_size(answerd_questions):
 I = answerd_questions
 answerd_questions = merge_answers(answerd_questions)
 
-
-print(*zip(range(1, 100), sum_col(answerd_questions)), sep='\n')
+print(DATASET, '\n\n')
+print(*zip(questions, sum_col(answerd_questions)), sep='\n')

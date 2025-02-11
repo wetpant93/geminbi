@@ -6,6 +6,11 @@ from tangles.util.entropy import information_gain
 from order_funcs import RatioCutOrder, NormalizedCutOrder, entropy_order
 from tangles.convenience import SurveyTangles, Survey, SimpleSurveyFeatureFactory
 from tangles.convenience.convenience_orders import create_order_function
+from tangles.convenience.convenience_features import compute_corner_features
+
+import sys
+
+sys.setrecursionlimit(10000)
 
 
 def split_at_true(single_col, invalid_values):
@@ -39,19 +44,27 @@ O1Ratio = RatioCutOrder(O1)
 O1Normal = NormalizedCutOrder(O1)
 Entropy = entropy_order
 information_gain_order = partial(information_gain, data_frame.to_numpy())
+information_gain_ratio = RatioCutOrder(information_gain_order)
 
 AGREEMENT = 50
+
+UNCROSS = False
 
 tangles = SurveyTangles.search(survey,
                                AGREEMENT,
                                feature_factory=create_true_feature_factory(
                                    survey),
-                               order=information_gain_order)
+                               order=information_gain_ratio,
+                               uncross=UNCROSS)
 
 
 tangles_dataset = {'tangles': tangles,
                    'questions': questions}
 
-save_as = f'{str(Dataset)}-InformationGain-{AGREEMENT}'
+if not UNCROSS:
+    save_as = f'{str(Dataset)}-InformationGainRatio-{AGREEMENT}'
+else:
+    save_as = f'{str(Dataset)}-InformationGainRatio-UNCROSS-{AGREEMENT}'
+
 
 ds.TangleDatasets.save(tangles_dataset, save_as)

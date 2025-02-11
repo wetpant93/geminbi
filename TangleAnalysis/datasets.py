@@ -13,6 +13,7 @@ class TangleDatasets(StrEnum):
     O1ProNoCommentUncross = 'TangleDatasets/ProNoComment-O1-UNCROSS-15'
     O1ProNoComment = 'TangleDatasets/ProNoComment-O1-50'
     InformationGainRatioFlash = 'TangleDatasets/Flash-InformationGainRatio-50'
+    O1RatioFlashNoComment = 'TangleDatasets/FlashNoComment-O1Ratio-50'
 
     def __str__(self):
         """
@@ -36,6 +37,8 @@ class TangleDatasets(StrEnum):
                 return "O1ProNoComment"
             case TangleDatasets.InformationGainRatioFlash:
                 return "InformationGainRatioFlash"
+            case TangleDatasets.O1RatioFlashNoComment:
+                return "O1RatioFlashNoComment"
             case _:
                 return None
 
@@ -77,7 +80,8 @@ class TangleDatasets(StrEnum):
                     TangleDatasets.O1FlashNoComment,
                     TangleDatasets.O1ProNoCommentUncross,
                     TangleDatasets.O1ProNoComment,
-                    TangleDatasets.InformationGainRatioFlash]:
+                    TangleDatasets.InformationGainRatioFlash,
+                    TangleDatasets.O1RatioFlashNoComment]:
 
             tangle_path = self.value
             with open(tangle_path, 'rb') as file:

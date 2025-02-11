@@ -57,7 +57,7 @@ class NCutOrder(OrderFuncDerivative):
     ):
         self._A = adjacency_matrix
         self._diag = np.array(self._A.sum(axis=0).data)
-        self._L = sparse.diags_array(self._diag) - self._A
+        self._L = sparse.diags(self._diag) - self._A
         self._total = self._diag.sum()
 
     def discrete_derivative(self, sep: np.ndarray) -> np.ndarray:
@@ -81,8 +81,7 @@ class NCutOrder(OrderFuncDerivative):
         elif denominator == 0:
             denominator = 1
         return (
-            0.25 * (feats * ((self._L) @ feats)).sum(axis=0) *
-            self._total / denominator
+            0.25 * (feats * ((self._L) @ feats)).sum(axis=0) * self._total / denominator
         )
 
 

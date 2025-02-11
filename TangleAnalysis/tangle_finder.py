@@ -27,7 +27,7 @@ def create_true_feature_factory(survey):
     return feature_factoy
 
 
-Dataset = ds.GeminiDatasets.Flash
+Dataset = ds.GeminiDatasets.FlashNoComment
 data = Dataset.load()
 answers = data['answers']
 questions = data['questions']
@@ -54,7 +54,7 @@ tangles = SurveyTangles.search(survey,
                                AGREEMENT,
                                feature_factory=create_true_feature_factory(
                                    survey),
-                               order=information_gain_ratio,
+                               order=O1Ratio,
                                uncross=UNCROSS)
 
 
@@ -62,9 +62,9 @@ tangles_dataset = {'tangles': tangles,
                    'questions': questions}
 
 if not UNCROSS:
-    save_as = f'{str(Dataset)}-InformationGainRatio-{AGREEMENT}'
+    save_as = f'{str(Dataset)}-O1Ratio-{AGREEMENT}'
 else:
-    save_as = f'{str(Dataset)}-InformationGainRatio-UNCROSS-{AGREEMENT}'
+    save_as = f'{str(Dataset)}-O1Ratio-UNCROSS-{AGREEMENT}'
 
 
 ds.TangleDatasets.save(tangles_dataset, save_as)

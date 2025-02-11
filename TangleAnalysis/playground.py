@@ -48,12 +48,11 @@ def show_tangle_matrix(tangle_matrix: np.ndarray,
     plt.show()
 
 
-Dataset = ds.TangleDatasets.O1Flash
+Dataset = ds.TangleDatasets.O1RatioFlashNoComment
 data = Dataset.load()
 tangles: SurveyTangles = data['tangles']
 questions: dict[str, str] = data['questions']
-AGREEMENT: int = 85
-
+AGREEMENT: int = 75
 
 # alle variabeln in snake_case ; alle klassen in CamelCase
 # information gain - order

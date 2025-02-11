@@ -4,7 +4,6 @@ from scipy.spatial.distance import pdist, squareform
 from tangles.util.matrix_order import matrix_order
 from tangles.util.graph.similarity import k_nearest_neighbors
 from tangles.util.graph.cut_weight import RatioCutOrder as RCO
-from tangles.util.graph.cut_weight_ import NCutOrder as NCO
 from tangles.util.graph.similarity import hamming_similarity
 from tangles.convenience.convenience_orders import create_order_function
 

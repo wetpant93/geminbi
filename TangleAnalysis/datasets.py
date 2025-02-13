@@ -2,6 +2,7 @@ from enum import StrEnum
 import pickle
 from os.path import isfile
 from tangles.convenience import SurveyTangles
+from tangle_wrapper import tangle_wrapper
 
 
 class TangleDatasets(StrEnum):
@@ -13,7 +14,11 @@ class TangleDatasets(StrEnum):
     O1ProNoCommentUncross = 'TangleDatasets/ProNoComment-O1-UNCROSS-15'
     O1ProNoComment = 'TangleDatasets/ProNoComment-O1-50'
     InformationGainRatioFlash = 'TangleDatasets/Flash-InformationGainRatio-50'
+    O1Flash15NoComment = 'TangleDatasets/Flash15NoComment-O1-60'
     O1RatioFlashNoComment = 'TangleDatasets/FlashNoComment-O1Ratio-50'
+    O1RatioFlash15NoComment = 'TangleDatasets/Flash15NoComment-O1Ratio-50'
+    InformationGainFlash15NoComment = 'TangleDatasets/Flash15NoComment-InformationGain-50'
+    InformationGainFlash15NoCommentUncross = 'TangleDatasets/Flash15NoComment-InformationGain-UNCROSS-30'
 
     def __str__(self):
         """
@@ -39,6 +44,14 @@ class TangleDatasets(StrEnum):
                 return "InformationGainRatioFlash"
             case TangleDatasets.O1RatioFlashNoComment:
                 return "O1RatioFlashNoComment"
+            case TangleDatasets.O1RatioFlash15NoComment:
+                return "O1RatioFlash15NoComment"
+            case TangleDatasets.InformationGainFlash15NoComment:
+                return "InformationGainFlash15NoComment"
+            case TangleDatasets.InformationGainFlash15NoCommentUncross:
+                return "InformationGainFlash15NoCommentUncross"
+            case TangleDatasets.O1Flash15NoComment:
+                return "O1Flash15NoComment"
             case _:
                 return None
 
@@ -81,7 +94,11 @@ class TangleDatasets(StrEnum):
                     TangleDatasets.O1ProNoCommentUncross,
                     TangleDatasets.O1ProNoComment,
                     TangleDatasets.InformationGainRatioFlash,
-                    TangleDatasets.O1RatioFlashNoComment]:
+                    TangleDatasets.O1RatioFlashNoComment,
+                    TangleDatasets.O1RatioFlash15NoComment,
+                    TangleDatasets.InformationGainFlash15NoComment,
+                    TangleDatasets.InformationGainFlash15NoCommentUncross,
+                    TangleDatasets.O1Flash15NoComment]:
 
             tangle_path = self.value
             with open(tangle_path, 'rb') as file:
@@ -98,6 +115,7 @@ class GeminiDatasets(StrEnum):
     Pro = 'GeminiDatasets/pro_!nq_pro'
     FlashNoComment = 'GeminiDatasets/flash_no_comment_!nq'
     ProNoComment = 'GeminiDatasets/pro_no_comment_!nq'
+    Flash15NoComment = 'GeminiDatasets/flash15_no_comment_!nq'
 
     def __str__(self):
         """
@@ -113,6 +131,8 @@ class GeminiDatasets(StrEnum):
                 return "FlashNoComment"
             case GeminiDatasets.ProNoComment:
                 return "ProNoComment"
+            case GeminiDatasets.Flash15NoComment:
+                return "Flash15NoComment"
             case _:
                 return None
 
@@ -131,7 +151,8 @@ class GeminiDatasets(StrEnum):
         if self in [GeminiDatasets.Flash,
                     GeminiDatasets.Pro,
                     GeminiDatasets.FlashNoComment,
-                    GeminiDatasets.ProNoComment]:
+                    GeminiDatasets.ProNoComment,
+                    GeminiDatasets.Flash15NoComment]:
             dataset_path = self.value
             with open(dataset_path, 'rb') as file:
                 return pickle.load(file)

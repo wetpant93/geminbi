@@ -4,6 +4,7 @@ from tangles.convenience import SurveyTangles
 import interesting_tangles as it
 import matplotlib.pyplot as plt
 import tangle_looker as tl
+from tangle_wrapper import tangle_wrapper
 
 
 def shorten_question(question: str) -> str:
@@ -48,11 +49,11 @@ def show_tangle_matrix(tangle_matrix: np.ndarray,
     plt.show()
 
 
-Dataset = ds.TangleDatasets.O1RatioFlashNoComment
+Dataset = ds.TangleDatasets.InformationGainFlash15NoComment
 data = Dataset.load()
 tangles: SurveyTangles = data['tangles']
 questions: dict[str, str] = data['questions']
-AGREEMENT: int = 75
+AGREEMENT: int = 70
 
 # alle variabeln in snake_case ; alle klassen in CamelCase
 # information gain - order

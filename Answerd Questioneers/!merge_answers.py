@@ -12,7 +12,7 @@ def to_key(entry_index: int, questioneer_index: int) -> tuple[str, str]:
 
 
 DATASET_SIZE = 1001  # Size of the Dataset
-DATASET = 'pro_no_comment_!nq'  # Name of the Dataset
+DATASET = 'flash15_no_comment_!nq'  # Name of the Dataset
 
 # Define tags for questions in the questioneers, each question in them is numberd.
 # Example:

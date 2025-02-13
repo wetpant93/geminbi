@@ -53,6 +53,17 @@ def create_tangle_table(tangles: SurveyTangles, specified: int | tuple[int, int]
     return dict(enumerate(tangle_matrix))
 
 
+def create_tangle_table_from_matrix(tangle_matrix: np.ndarray) -> dict[int, np.ndarray]:
+    """
+    Returns a dict of all tangles in TangleMatrix.
+
+    Parameters
+    ----------
+    TangleMatrix: np.ndarray
+    """
+    return dict(enumerate(tangle_matrix))
+
+
 class InterestFunction:
     def __init__(self, tangle_table: dict[int, np.ndarray]):
         """

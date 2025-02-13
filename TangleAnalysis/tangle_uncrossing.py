@@ -1,0 +1,68 @@
+import pandas as pd
+import numpy as np
+
+from tangles.convenience.survey import Survey
+from tangles.convenience.convenience_orders import create_order_function
+from tangles.separations.system import SetSeparationSystemOrderFunc, FeatureSystem, MetaData
+from tangles.search import uncross_distinguishers, TangleSweep
+from tangles import agreement_func
+from tangles.util.logic import array_to_term
+
+from datasets import GeminiDatasets
+from building_features import create_feature_system
+
+def interpret_metadata(metadata: MetaData, feat_sys: FeatureSystem):
+    if metadata.type == 'custom':
+        if metadata.orientation == -1:
+            print(f'¬({metadata.info})')
+        else:
+            print(metadata.info)
+
+def interpret_efficient_distinguisher(feature_id: int, feat_sys: FeatureSystem, feature_matrix: np.ndarray, text: list[str]):
+    print(array_to_term(feat_sys[feature_id], feature_matrix, text))
+    
+
+def tangle_search_uncrossing(dataset: GeminiDatasets):
+    data = dataset.load()
+    answers = data['answers']
+    questions = data['questions']
+
+    data_frame = pd.DataFrame(answers)
+    survey = Survey(data_frame)
+    survey.set_variable_types('numerical')
+
+    feat_sys = create_feature_system(survey, questions)
+    
+    feature_matrix = feat_sys[:]
+    text = [feat_sys.feature_metadata(i).info for i in range(len(feat_sys))]
+    
+    O1 = create_order_function('O1', feat_sys[:])
+    
+    feat_sys_ord = SetSeparationSystemOrderFunc(feat_sys, O1)
+    
+    sorted_ids = feat_sys_ord.sorted_ids
+    
+    sweep = TangleSweep(agreement_func=agreement_func(feat_sys), le_func = feat_sys.is_le)
+    
+    agreement_value = 20
+    
+    for i, feature_id in enumerate(sorted_ids):
+        print("step", (i+1), "appending", feature_id)
+        sweep.append_separation(feature_id, agreement_value)
+        print("uncrossing")
+        uncross_distinguishers(sweep, feat_sys_ord, agreement_value)
+        num_max_tangles = len(sweep.tree.k_tangles(len(sweep.tree.sep_ids), agreement_value))
+        print("number of leaves left is", num_max_tangles)
+    
+    _, efficient_distinguisher_ids = sweep.tree.get_efficient_distinguishers(agreement=agreement_value)
+    
+    print('found efficient distinguishers', efficient_distinguisher_ids)
+    
+    for efficient_distinguisher in efficient_distinguisher_ids:
+        print('interpreting ', efficient_distinguisher)
+        interpret_efficient_distinguisher(efficient_distinguisher, feat_sys, feature_matrix, text)
+    
+if __name__ == '__main__':
+    dataset = GeminiDatasets.Flash15NoComment
+    
+    tangle_search_uncrossing(dataset=dataset)

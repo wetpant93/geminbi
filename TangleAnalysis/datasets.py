@@ -1,9 +1,9 @@
 from enum import StrEnum
+from dataclasses import dataclass
 import pickle
 from os.path import isfile
 from tangles.convenience import SurveyTangles
 from tangle_wrapper import tangle_wrapper
-
 
 class TangleDatasets(StrEnum):
     O1Flash = 'TangleDatasets/Flash-O1-50'
@@ -69,10 +69,10 @@ class TangleDatasets(StrEnum):
         """
 
         if isfile(f'TangleDatasets/{save_as}'):
-            raise ValueError('Such a file already exists')
+            raise ValueError(f'The file {save_as} already exists')
 
-        with open(f'TangleDatasets/{save_as}', 'wb') as File:
-            pickle.dump(tangles_dataset, File)
+        with open(f'TangleDatasets/{save_as}', 'wb') as file:
+            pickle.dump(tangles_dataset, file)
 
     def load(self) -> dict[str, SurveyTangles | dict[str, str]]:
         """
@@ -158,3 +158,12 @@ class GeminiDatasets(StrEnum):
                 return pickle.load(file)
 
         raise ValueError('There is no such dataset')
+    
+class OrderFuncChoice(StrEnum):
+    O1 = "O1"
+
+@dataclass
+class Experiment:
+    gemini_dataset: GeminiDatasets
+    order_func_choice: OrderFuncChoice
+    agreement_value: int

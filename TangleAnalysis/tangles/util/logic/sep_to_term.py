@@ -78,9 +78,9 @@ class RecursionLogic:
         nested_bias = np.maximum(a_ar * (c_ar == 0), b_ar * (d_ar == 0))
         if np.any(nested_bias) > 0:
             return self._terms[np.argmax(nested_bias)]
-        scores_1 = np.zeros(self._features.shape[1], dtype=np.float_)
+        scores_1 = np.zeros(self._features.shape[1], dtype=np.float64)
         scores_1[c_ar != 0] = a_ar[c_ar != 0] / c_ar[c_ar != 0]
-        scores_2 = np.zeros(self._features.shape[1], dtype=np.float_)
+        scores_2 = np.zeros(self._features.shape[1], dtype=np.float64)
         scores_2[d_ar != 0] = b_ar[d_ar != 0] / d_ar[d_ar != 0]
         return self._terms[np.argmax(np.maximum(scores_1, scores_2))]
 

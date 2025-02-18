@@ -24,7 +24,7 @@ def show_tangle_matrix(tangle_matrix: np.ndarray,
 
 
 def build_tot_sweep(feat_sys: FeatureSystem, efficient_distinguisher_ids: np.ndarray,
-                    agreement: int, order_function, efficient_distinguisher_meta: list[str] = None) -> tuple[TangleSweep, FeatureSystem]:
+                    agreement: int, efficient_distinguisher_meta: list[str] = None) -> tuple[TangleSweep, FeatureSystem]:
 
     eff_feat_sys = FeatureSystem(feat_sys.datasize)
     eff_features = feat_sys[efficient_distinguisher_ids]
@@ -38,20 +38,15 @@ def build_tot_sweep(feat_sys: FeatureSystem, efficient_distinguisher_ids: np.nda
 
     eff_feat_sys.add_features(eff_features, eff_features_meta)
 
-    eff_feat_ord = SetSeparationSystemOrderFunc(eff_feat_sys, order_function)
-
     eff_sweep = TangleSweep(agreement_func=agreement_func(
         eff_feat_sys), le_func=eff_feat_sys.is_le)
 
-    for i, feature_id in enumerate(eff_feat_ord.sorted_ids):
-        print("step", (i+1), "appending", feature_id)
-        eff_sweep.append_separation(feature_id, agreement)
+    for i in range(len(efficient_distinguisher_ids)):
+        print("step", (i+1), "appending", i)
+        eff_sweep.append_separation(i, agreement)
         num_max_tangles = len(eff_sweep.tree.k_tangles(
             len(eff_sweep.tree.sep_ids), agreement))
         print("number of leaves left is", num_max_tangles)
-
-    #   print(eff_sweep.tree.sep_ids, eff_feat_ord.sorted_ids)
-    #   print(eff_feat_sys.feature_metadata(eff_sweep.tree.sep_ids)[0].info)
 
     return eff_sweep, eff_feat_sys
 
@@ -67,7 +62,7 @@ def interpret_tot_tangles(sweep: TangleSweep, feat_sys: FeatureSystem, agreement
             if ori == 1:
                 tangle_meta.append(metadata[i].info.__repr__())
             elif ori == -1:
-                tangle_meta.append(f'¬{metadata[i].info.__repr__()}')
+                tangle_meta.append(f'¬({metadata[i].info.__repr__()})')
             else:
                 break
         if tangle_meta is []:
@@ -78,7 +73,7 @@ def interpret_tot_tangles(sweep: TangleSweep, feat_sys: FeatureSystem, agreement
         meta_expr.append(expr(tangle_meta))
 
     # print(*meta_expr, sep='\n\n')
-    meta_expr = [e.to_dnf() for e in meta_expr]
+    meta_expr = [e.simplify() for e in meta_expr]
     # print('\n\n')
     print(*meta_expr, sep='\n\n')
 

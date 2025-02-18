@@ -14,14 +14,6 @@ from datasets import GeminiDatasets
 from building_features import create_feature_system
 
 
-def interpret_metadata(metadata: MetaData, feat_sys: FeatureSystem):
-    if metadata.type == 'custom':
-        if metadata.orientation == -1:
-            print(f'¬({metadata.info})')
-        else:
-            print(metadata.info)
-
-
 def interpret_efficient_distinguisher(feature_id: int, feat_sys: FeatureSystem, feature_matrix: np.ndarray, text: list[str]):
     print(array_to_term(feat_sys[feature_id], feature_matrix, text))
 
@@ -50,7 +42,7 @@ def tangle_search_uncrossing(dataset: GeminiDatasets):
     sweep = TangleSweep(agreement_func=agreement_func(
         feat_sys), le_func=feat_sys.is_le)
 
-    agreement_value = 70
+    agreement_value = 25
 
     for i, feature_id in enumerate(sorted_ids):
         print("step", (i+1), "appending", feature_id)
@@ -77,7 +69,7 @@ def tangle_search_uncrossing(dataset: GeminiDatasets):
         feat_sys[eid], feature_matrix, text) for eid in efficient_distinguisher_ids]
 
     eff_sweep, eff_feat_sys = build_tot_sweep(feat_sys, efficient_distinguisher_ids,
-                                              agreement_value, O1, interpretation_distinguisher)
+                                              agreement_value, interpretation_distinguisher)
 
     interpret_tot_tangles(eff_sweep, eff_feat_sys, agreement_value)
 

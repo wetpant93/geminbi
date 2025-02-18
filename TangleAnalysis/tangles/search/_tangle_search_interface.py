@@ -106,7 +106,8 @@ class TangleSearchWidget(ABC):
         if min_agreement is None:
             min_agreement = self.tree.limit
         mat = self.tangle_matrix(min_agreement, only_initial_seps=False)
-        ids = self.oriented_feature_ids_for_agreement(min_agreement)[: mat.shape[1]]
+        ids = self.oriented_feature_ids_for_agreement(min_agreement)[
+            : mat.shape[1]]
         return tangle_score(
             mat,
             ids,

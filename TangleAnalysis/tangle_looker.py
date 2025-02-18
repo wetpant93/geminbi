@@ -7,11 +7,9 @@ class TangleViewer:
 
         self.tangles = tangles
         self.questions = questions
-        self.max_tags = self.tangles.tangle_matrix().shape[1]
-
-        self.tag_order = np.array([metadata[0].info[0]
-                                  for metadata in tangles.ordered_metadata()
-                                  if type(metadata[0].info[0]) == str])[:self.max_tags]
+        _, meta = self.tangles.tangle_matrix(return_metadata=True)
+        self.max_tags = len(meta)
+        self.tag_order = np.array([m[0].info[0] for m in meta])
 
     def show_tangle(self, tangle: np.ndarray,
                     surpress_non_answer: bool = True,

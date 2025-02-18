@@ -84,7 +84,8 @@ class TangleSweep:
                 level_extend, self._search_tree.sep_ids[i], np.empty(0)
             )
             if progress_callback:
-                progress_callback(tsp.PROGRESS_TYPE_SWEEP_RUNNING, sweep=self, level=i)
+                progress_callback(
+                    tsp.PROGRESS_TYPE_SWEEP_RUNNING, sweep=self, level=i)
         if progress_callback:
             progress_callback(
                 tsp.PROGRESS_TYPE_SOMETHING_FINISHED, info="sweep finished", sweep=self

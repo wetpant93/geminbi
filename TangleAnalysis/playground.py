@@ -4,7 +4,7 @@ from tangles.convenience import SurveyTangles
 import interesting_tangles as it
 import matplotlib.pyplot as plt
 import tangle_looker as tl
-from tangle_wrapper import tangle_wrapper
+from tangles.convenience.survey_tangles_visualization import plot_tangle_search_tree, plot_tangle_matrix
 
 
 def shorten_question(question: str) -> str:
@@ -49,23 +49,25 @@ def show_tangle_matrix(tangle_matrix: np.ndarray,
     plt.show()
 
 
-Dataset = ds.TangleDatasets.InformationGainFlash15NoComment
+Dataset = ds.TangleDatasets.InformationGainFlash15NoCommentSolo
 data = Dataset.load()
 tangles: SurveyTangles = data['tangles']
 questions: dict[str, str] = data['questions']
-AGREEMENT: int = 70
+AGREEMENT: int = 85
 
 # alle variabeln in snake_case ; alle klassen in CamelCase
 # information gain - order
 
 tangles.change_agreement(AGREEMENT)
+# plot_tangle_search_tree(tangles)
+
 
 viewer = tl.TangleViewer(tangles, questions)
 tangle_matrix = tangles.tangle_matrix()
 
 title = f'OrderFunction = {str(Dataset)}, Agreement = {AGREEMENT}'
 
-tangle_table = it.create_tangle_table(tangles, specified=0)
+tangle_table = it.create_tangle_table(tangles, specified=50)
 interest_function = it.InterestFunction(tangle_table)
 all_cliques = interest_function.get_all_cliques(threshold=2)
 max_cliques = interest_function.get_maximal_cliques(all_cliques)
@@ -84,4 +86,5 @@ def show_key_list(key_list):
                            title=title)
 
 
+# plot_tangle_matrix(tangles)
 show_tangle_matrix(tangle_matrix, title=title)

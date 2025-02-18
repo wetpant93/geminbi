@@ -13,8 +13,17 @@ class tangle_wrapper:
     def __calc_valid(self):
         tangle_matrix, meta_data = self.tangle.tangle_matrix(
             return_metadata=True)
+
+        meta_data_naked = [str(meta[0].info) for meta in meta_data]
+        meta_ordering_naked = [
+            str(meta[0].info) for meta in self.tangle.ordered_metadata()]
+
+        ordered_meta_new = np.isin(meta_ordering_naked, meta_data_naked)
+        meta_data = np.array(self.tangle.ordered_metadata())[ordered_meta_new]
+
         self.valid_feature_idx = np.empty(len(meta_data))
         self.ordered_metadata_ = []
+
         for i, meta in enumerate(meta_data):
             if type(meta[0].info[0]) == str:
                 self.valid_feature_idx[i] = True

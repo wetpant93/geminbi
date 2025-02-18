@@ -14,123 +14,80 @@ from tangles.search import TangleSweep
 from tangles.util.tree import BinTreeNode
 from tangles.search.progress import DefaultProgressCallback
 
+from building_features import create_feature_meta_pair
+
 import sys
 
 sys.setrecursionlimit(10000)
 
+if __name__ == '__main__':
+    Dataset = ds.GeminiDatasets.Flash15NoCommentSolo
+    data = Dataset.load()
+    answers = data['answers']
+    questions = data['questions']
 
-def split_at_true(single_col, invalid_values):
-    single_col = np.array(single_col)
-    feature = (single_col == True).astype(int) - (single_col == False)
-    metadata = np.empty(1, dtype=object)
-    metadata[0] = ('==', True)
-    return feature[..., np.newaxis], metadata
+    data_frame = pd.DataFrame(answers)
+    survey = Survey(data_frame)
+    survey.set_variable_types('numerical')
 
+    features, feature_meta = create_feature_meta_pair(survey)
 
-def create_true_feature_factory(survey):
-    feature_factoy = SimpleSurveyFeatureFactory(survey)
-    feature_factoy.numvar_func = split_at_true
-    return feature_factoy
+    O1 = create_order_function('O1', features)
+    O1Ratio = RatioCutOrder(O1)
+    O1Normal = NormalizedCutOrder(O1)
+    Entropy = entropy_order
+    information_gain_order = partial(information_gain, data_frame.to_numpy())
+    information_gain_ratio = RatioCutOrder(information_gain_order)
 
+    order_names = {
+        O1: 'O1',
+        O1Ratio: 'O1Ratio',
+        O1Normal: 'O1Normal',
+        Entropy: 'Entropy',
+        information_gain_order: 'InformationGain',
+        information_gain_ratio: 'InformationGainRatio'
+    }
 
-Dataset = ds.GeminiDatasets.Flash15NoComment
-data = Dataset.load()
-answers = data['answers']
-questions = data['questions']
+    selected_order = information_gain_order
+    order_name = order_names[selected_order]
 
-data_frame = pd.DataFrame(answers)
-survey = Survey(data_frame)
-survey.set_variable_types('numerical')
+    feature_orders = selected_order(features)
+    sorted_feature_idx = np.argsort(feature_orders)
 
-factory = create_true_feature_factory(survey)
-features, feature_meta = factory.create_features()
+    corners, corner_meta = compute_corner_features(
+        features, order_func=selected_order,
+        min_side_size=100, max_order_factor=2, global_max_order=feature_orders[sorted_feature_idx][(len(feature_orders) - 1)//3])
 
+    all_features = np.append(features, corners, axis=1)
+    all_meta = np.append(feature_meta, corner_meta)
 
-O1 = create_order_function('O1', features)
-O1Ratio = RatioCutOrder(O1)
-O1Normal = NormalizedCutOrder(O1)
-Entropy = entropy_order
-information_gain_order = partial(information_gain, data_frame.to_numpy())
-information_gain_ratio = RatioCutOrder(information_gain_order)
+    original_feature_ids = list(range(features.shape[1]))
+    corner_feature_ids = list(
+        range(len(original_feature_ids) + corners.shape[1]))
 
+    sep_sys = FeatureSystem.with_array(
+        all_features, metadata=all_meta)
 
-order_names = {
-    O1: 'O1',
-    O1Ratio: 'O1Ratio',
-    O1Normal: 'O1Normal',
-    Entropy: 'Entropy',
-    information_gain_order: 'InformationGain',
-    information_gain_ratio: 'InformationGainRatio'
-}
+    for meta in sep_sys.feature_metadata(corner_feature_ids):
+        meta.type = 'inf'
 
+    AGREEMENT = 50
+    UNCROSS = False
 
-selected_order = information_gain_order
-order_name = order_names[selected_order]
+    tangles = SurveyTangles.search(survey,
+                                   agreement=AGREEMENT,
+                                   features_or_separations=sep_sys,
+                                   order=selected_order,
+                                   uncross=UNCROSS)
 
+    tangles.sweep.original_feature_ids = original_feature_ids
 
-feature_orders = selected_order(features)
-sorted_feature_idx = np.argsort(feature_orders)
+    tangles_dataset = {'tangles': tangles,
+                       'questions': questions}
 
-features = features.T[sorted_feature_idx].T
-feature_meta = feature_meta[sorted_feature_idx]
+    if not UNCROSS:
+        save_as = f'{str(Dataset)}-{order_name}-{AGREEMENT}'
+    else:
+        save_as = f'{str(Dataset)}-{order_name}-UNCROSS-{AGREEMENT}'
 
-corners, corner_meta = compute_corner_features(
-    features, order_func=selected_order,
-    min_side_size=250, max_order_factor=2, global_max_order=feature_orders[sorted_feature_idx][(len(feature_orders) - 1)//2])
-
-# print(selected_order(corners), feature_orders, sep='\n\n')
-
-
-all_features = np.append(corners, features, axis=1)
-all_meta = np.append(corner_meta, feature_meta)
-all_features_by_size = np.argsort(selected_order(all_features))
-
-
-# all_features = features
-# all_meta = feature_meta
-# all_features_by_size = np.argsort(selected_order(all_features))
-
-# corner_index_by_size = np.argsort(selected_order(corners))
-
-all_features_sorted = all_features.T[all_features_by_size].T
-all_meta_sorted = all_meta[all_features_by_size]
-
-
-sep_sys = FeatureSystem.with_array(
-    all_features_sorted, metadata=all_meta_sorted)
-
-
-AGREEMENT = 50
-UNCROSS = False
-
-
-# a_func = tangles.agreement_func(sep_sys=sep_sys)
-
-# tsweep = tangles.TangleSweep(a_func, le_func=sep_sys.is_le,
-#                              sep_ids=sep_sys.all_sep_ids(), forbidden_tuple_size=3)
-
-
-# tsweep.sweep_below(agreement=AGREEMENT,
-#                    progress_callback=DefaultProgressCallback())
-
-
-tangles = SurveyTangles.search(survey,
-                               agreement=AGREEMENT,
-                               features_or_separations=sep_sys,
-                               order=selected_order,
-                               uncross=UNCROSS)
-
-
-tangles = tangle_wrapper(tangles)
-
-
-tangles_dataset = {'tangles': tangles,
-                   'questions': questions}
-
-if not UNCROSS:
-    save_as = f'{str(Dataset)}-{order_name}-{AGREEMENT}'
-else:
-    save_as = f'{str(Dataset)}-{order_name}-UNCROSS-{AGREEMENT}'
-
-
-ds.TangleDatasets.save(tangles_dataset, save_as)
+    ds.TangleDatasets.save(tangles_dataset, save_as)

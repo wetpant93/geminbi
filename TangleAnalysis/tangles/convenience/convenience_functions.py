@@ -27,12 +27,14 @@ class TangleSweepFeatureSys(TangleSearchWidget):
         self,
         sep_sys: SetSeparationSystemBase,
         sep_ids: Optional[np.array] = None,
-        forbidden_tuple_size: int = 3,
+        forbidden_tuple_size: int = 3
     ):
         self._sweep = TangleSweep(
-            agreement_func(sep_sys), sep_sys.is_le, sep_ids, forbidden_tuple_size
+            agreement_func(
+                sep_sys), sep_sys.is_le, sep_ids, forbidden_tuple_size
         )
         self._sep_sys = sep_sys
+        self.original_feature_ids = sep_sys.all_sep_ids()
         self._order_values: Optional[np.array] = None
         # hijacked design: instead of wrapping a low level engine class for the algorithm, we have to wrap a higher level class that is exposed to the user in other places...
 
@@ -50,7 +52,11 @@ class TangleSweepFeatureSys(TangleSearchWidget):
 
     @property
     def original_feature_ids(self):
-        return self.tree.sep_ids
+        return self._original_feature_ids
+
+    @original_feature_ids.setter
+    def original_feature_ids(self, value):
+        self._original_feature_ids = value
 
     @property
     def all_oriented_feature_ids(self):
@@ -62,7 +68,13 @@ class TangleSweepFeatureSys(TangleSearchWidget):
     def tangle_matrix(
         self, min_agreement: Optional[int] = None, only_initial_seps: bool = True
     ):
-        return self.tree.tangle_matrix(agreement=min_agreement)
+        mat = self.tree.tangle_matrix(agreement=min_agreement)
+        if only_initial_seps:
+            mat = mat[
+                :, np.isin(self.tree.sep_ids[: mat.shape[1]], self.original_feature_ids)
+            ]
+
+        return mat
 
     def lower_agreement(self, min_agreement: int, progress_callback=None):
         """
@@ -87,7 +99,8 @@ def search_tangles(
     separations: Union[SetSeparationSystemBase, np.ndarray],
     min_agreement: int,
     max_number_of_seps: Union[int, None] = None,
-    order: Optional[Union[list, np.ndarray, SetSeparationOrderFunction]] = None,
+    order: Optional[Union[list, np.ndarray,
+                          SetSeparationOrderFunction]] = None,
     progress_callback=None,
     sep_metadata: Union[list, np.ndarray] = None,
 ) -> TangleSweepFeatureSys:
@@ -254,7 +267,8 @@ def _create_sep_sys(separations, metadata=None):
                 and any(a > 0 for a in unique_values)
                 and any(a == 0 for a in unique_values)
             )
-            sep_sys = SetSeparationSystem.with_array(separations, metadata=metadata)
+            sep_sys = SetSeparationSystem.with_array(
+                separations, metadata=metadata)
         else:  # we assume the separations are encoded as 0/1, -1/1 or neg/pos
             assert any(a <= 0 for a in unique_values) and any(
                 a > 0 for a in unique_values

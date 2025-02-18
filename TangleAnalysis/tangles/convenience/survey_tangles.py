@@ -167,7 +167,8 @@ class SurveyTangles:
                     tangles.similarity_matrix = cosine_similarity(
                         survey.data.to_numpy(),
                         sim_thresh=0.25,
-                        max_neighbours=min(max(survey.num_respondents // 5, 1), 50),
+                        max_neighbours=min(
+                            max(survey.num_respondents // 5, 1), 50),
                         sequential=True,
                     )
                     if progress_callback:
@@ -175,9 +176,11 @@ class SurveyTangles:
                             PROGRESS_TYPE_SOMETHING_FINISHED,
                             info="computing similarity... finished",
                         )
-                order_func = create_order_function(order, tangles.similarity_matrix)
+                order_func = create_order_function(
+                    order, tangles.similarity_matrix)
             else:
-                order_func = create_order_function(order, features_or_separations)
+                order_func = create_order_function(
+                    order, features_or_separations)
             tangles.order = order_func
         else:
             tangles.order = order
@@ -194,8 +197,10 @@ class SurveyTangles:
         self.survey: Survey = survey
         self.sweep: Optional[TangleSearchWidget] = None
         self.agreement: Optional[int] = None
-        self.similarity_matrix: Union[np.ndarray, scipy.sparse.spmatrix, None] = None
-        self.order: Union[list, np.ndarray, SetSeparationOrderFunction, None] = None
+        self.similarity_matrix: Union[np.ndarray,
+                                      scipy.sparse.spmatrix, None] = None
+        self.order: Union[list, np.ndarray,
+                          SetSeparationOrderFunction, None] = None
         self.progress_callback: TangleSearchProgressType = DefaultProgressCallback()
 
     def initialize_search(
@@ -299,7 +304,8 @@ class SurveyTangles:
             A list of feature ids, sorted by order.
         """
 
-        oriented_seps = self.sweep.oriented_feature_ids_for_agreement(self.agreement)
+        oriented_seps = self.sweep.oriented_feature_ids_for_agreement(
+            self.agreement)
         if only_original_features:
             oriented_seps = oriented_seps[
                 np.isin(oriented_seps, self.sweep.original_feature_ids)
@@ -345,7 +351,8 @@ class SurveyTangles:
             tangle_mat = unique_rows(tangle_mat)
         if remove_prefixing_tangles:
             s = (
-                (tangle_mat[:, np.newaxis, :] * tangle_mat[np.newaxis, :, :]) >= 0
+                (tangle_mat[:, np.newaxis, :] *
+                 tangle_mat[np.newaxis, :, :]) >= 0
             ).all(axis=2)
             nonz = (tangle_mat != 0).sum(axis=1)
             tangle_mat = tangle_mat[
@@ -422,7 +429,8 @@ class SurveyTangles:
             else self.sweep.all_oriented_feature_ids
         )
         meta_data = deepcopy(
-            [m.tail_as_list() for m in self.sweep.sep_sys.separation_metadata(sep_ids)]
+            [m.tail_as_list()
+             for m in self.sweep.sep_sys.separation_metadata(sep_ids)]
         )
         if insert_labels:
             variables = self.survey.variables
@@ -592,7 +600,8 @@ class SurveyTangles:
             ]
             for sep_id in sep_ids
         ]
-        selected_cols = self.survey.interpret_column_selection(column_selection)
+        selected_cols = self.survey.interpret_column_selection(
+            column_selection)
         if only_affected_questions:
             included_vars = set().union(
                 *[[m.info[0] for m in mlist] for mlist in metadata]
@@ -637,7 +646,8 @@ class SurveyTangles:
                 if q.name in included_vars
             }
         else:
-            answers = {q.name: q.create_values() for q in self.survey.variables}
+            answers = {q.name: q.create_values()
+                       for q in self.survey.variables}
         for metadata, ori in zip(metadata_list, orientation):
             if ori == 0:
                 continue

@@ -47,7 +47,8 @@ class TangleSearchTree:
     @property
     def limit(
         self,
-    ):  # TODO: I assume, we usually don't want to check the last level's limit (it is not extendable anyways)
+        # TODO: I assume, we usually don't want to check the last level's limit (it is not extendable anyways)
+    ):
         """The maximum order of a node which we have not yet extended.
 
         For every value greater than this limit we know with certainty every tangle (as the agreeement value decreases
@@ -339,7 +340,7 @@ class TangleSearchTree:
         self._sep_ids = np.insert(self._sep_ids, insertion_idx, new_sep_id)
 
     def _sep_ids_to_update_after_insertion(self, insertion_idx: int) -> np.ndarray:
-        return self._sep_ids[(insertion_idx + 1) :]
+        return self._sep_ids[(insertion_idx + 1):]
 
     @property
     def root(self):
@@ -418,7 +419,8 @@ class TangleSearchTree:
                     which_child.append(0)
         with open(filename, "wb") as f:
             pickle.dump(
-                [parent_index, which_child, cores, tangle_agreements, self.sep_ids], f
+                [parent_index, which_child, cores,
+                    tangle_agreements, self.sep_ids], f
             )
 
     @staticmethod

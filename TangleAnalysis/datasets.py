@@ -1,4 +1,5 @@
 from enum import StrEnum
+from dataclasses import dataclass
 import pickle
 from os.path import isfile
 from tangles.convenience import SurveyTangles
@@ -19,6 +20,8 @@ class TangleDatasets(StrEnum):
     O1RatioFlash15NoComment = 'TangleDatasets/Flash15NoComment-O1Ratio-50'
     InformationGainFlash15NoComment = 'TangleDatasets/Flash15NoComment-InformationGain-50'
     InformationGainFlash15NoCommentUncross = 'TangleDatasets/Flash15NoComment-InformationGain-UNCROSS-30'
+    InformationGainFlash15NoCommentSolo = 'TangleDatasets/Flash15NoCommentSolo-InformationGain-50'
+    O1Flash15NoCommentSolo = 'TangleDatasets/Flash15NoCommentSolo-O1-50'
 
     def __str__(self):
         """
@@ -52,6 +55,10 @@ class TangleDatasets(StrEnum):
                 return "InformationGainFlash15NoCommentUncross"
             case TangleDatasets.O1Flash15NoComment:
                 return "O1Flash15NoComment"
+            case TangleDatasets.InformationGainFlash15NoCommentSolo:
+                return "InformationGainFlash15NoCommentSolo"
+            case TangleDatasets.O1Flash15NoCommentSolo:
+                return "O1Flash15NoCommentSolo"
             case _:
                 return None
 
@@ -69,10 +76,10 @@ class TangleDatasets(StrEnum):
         """
 
         if isfile(f'TangleDatasets/{save_as}'):
-            raise ValueError('Such a file already exists')
+            raise ValueError(f'The file {save_as} already exists')
 
-        with open(f'TangleDatasets/{save_as}', 'wb') as File:
-            pickle.dump(tangles_dataset, File)
+        with open(f'TangleDatasets/{save_as}', 'wb') as file:
+            pickle.dump(tangles_dataset, file)
 
     def load(self) -> dict[str, SurveyTangles | dict[str, str]]:
         """
@@ -98,7 +105,9 @@ class TangleDatasets(StrEnum):
                     TangleDatasets.O1RatioFlash15NoComment,
                     TangleDatasets.InformationGainFlash15NoComment,
                     TangleDatasets.InformationGainFlash15NoCommentUncross,
-                    TangleDatasets.O1Flash15NoComment]:
+                    TangleDatasets.O1Flash15NoComment,
+                    TangleDatasets.InformationGainFlash15NoCommentSolo,
+                    TangleDatasets.O1Flash15NoCommentSolo]:
 
             tangle_path = self.value
             with open(tangle_path, 'rb') as file:
@@ -116,6 +125,7 @@ class GeminiDatasets(StrEnum):
     FlashNoComment = 'GeminiDatasets/flash_no_comment_!nq'
     ProNoComment = 'GeminiDatasets/pro_no_comment_!nq'
     Flash15NoComment = 'GeminiDatasets/flash15_no_comment_!nq'
+    Flash15NoCommentSolo = 'GeminiDatasets/flash15_no_comment_solo_!nq'
 
     def __str__(self):
         """
@@ -133,6 +143,8 @@ class GeminiDatasets(StrEnum):
                 return "ProNoComment"
             case GeminiDatasets.Flash15NoComment:
                 return "Flash15NoComment"
+            case GeminiDatasets.Flash15NoCommentSolo:
+                return "Flash15NoCommentSolo"
             case _:
                 return None
 
@@ -152,9 +164,21 @@ class GeminiDatasets(StrEnum):
                     GeminiDatasets.Pro,
                     GeminiDatasets.FlashNoComment,
                     GeminiDatasets.ProNoComment,
-                    GeminiDatasets.Flash15NoComment]:
+                    GeminiDatasets.Flash15NoComment,
+                    GeminiDatasets.Flash15NoCommentSolo]:
             dataset_path = self.value
             with open(dataset_path, 'rb') as file:
                 return pickle.load(file)
 
         raise ValueError('There is no such dataset')
+
+
+class OrderFuncChoice(StrEnum):
+    O1 = "O1"
+
+
+@dataclass
+class Experiment:
+    gemini_dataset: GeminiDatasets
+    order_func_choice: OrderFuncChoice
+    agreement_value: int

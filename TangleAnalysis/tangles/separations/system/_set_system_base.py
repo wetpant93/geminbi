@@ -145,7 +145,7 @@ class SetSeparationSystemBase(ABC):
         )
         for i in range(seps.shape[1]):
             tmp.fill(-1)
-            tmp[seps.indices[seps.indptr[i] : seps.indptr[i + 1]], 0] = 1
+            tmp[seps.indices[seps.indptr[i]: seps.indptr[i + 1]], 0] = 1
             ids[i], orientations[i] = sep_sys.add_seps(
                 tmp, None if metadata is None else metadata[i]
             )
@@ -260,6 +260,7 @@ class SetSeparationSystemBase(ABC):
         MetaData
             A metadata object.
         """
+
         if sep_ids is None:
             return self.sep_metadata
         if isinstance(sep_ids, numbers.Integral):
@@ -302,9 +303,11 @@ class SetSeparationSystemBase(ABC):
         for i in range(new_seps.shape[1]):
             ids[i], orientations[i] = self._add_sep(new_seps[:, [i]])
             if ids[i] < len(self.sep_metadata):
-                self.sep_metadata[ids[i]].append(MetaData(metadata[i], orientations[i]))
+                self.sep_metadata[ids[i]].append(
+                    MetaData(metadata[i], orientations[i]))
             else:
-                self.sep_metadata.append(MetaData(metadata[i], orientations[i]))
+                self.sep_metadata.append(
+                    MetaData(metadata[i], orientations[i]))
         return ids, orientations
 
     @abstractmethod
@@ -409,9 +412,12 @@ class SetSeparationSystemBase(ABC):
 
         sep_ids = np.empty(4, dtype=int)
         orientations = np.empty(4, dtype=np.int8)
-        sep_ids[0], orientations[0] = self.add_corner(sep_id_a, -1, sep_id_b, -1)
-        sep_ids[1], orientations[1] = self.add_corner(sep_id_a, 1, sep_id_b, -1)
-        sep_ids[2], orientations[2] = self.add_corner(sep_id_a, -1, sep_id_b, 1)
+        sep_ids[0], orientations[0] = self.add_corner(
+            sep_id_a, -1, sep_id_b, -1)
+        sep_ids[1], orientations[1] = self.add_corner(
+            sep_id_a, 1, sep_id_b, -1)
+        sep_ids[2], orientations[2] = self.add_corner(
+            sep_id_a, -1, sep_id_b, 1)
         sep_ids[3], orientations[3] = self.add_corner(sep_id_a, 1, sep_id_b, 1)
         return sep_ids, orientations
 
@@ -460,7 +466,7 @@ class SetSeparationSystemBase(ABC):
         """
 
         for i, sep_id1 in enumerate(sep_ids):
-            for sep_id2 in sep_ids[i + 1 :]:
+            for sep_id2 in sep_ids[i + 1:]:
                 if not self.is_nested(sep_id1, sep_id2):
                     yield sep_id1, sep_id2
 
@@ -469,7 +475,7 @@ class SetSeparationSystemBase(ABC):
         self, sep_ids: Sequence[int]
     ) -> Union[tuple[int, int], tuple[None, None]]:
         for i, sep_id1 in enumerate(sep_ids):
-            for sep_id2 in sep_ids[i + 1 :]:
+            for sep_id2 in sep_ids[i + 1:]:
                 if not self.is_nested(sep_id1, sep_id2):
                     return sep_id1, sep_id2
         return None, None
